@@ -10,7 +10,10 @@
         "Monitor orchard closely",
         "Focus on cultural controls",
         "Minimal chemical intervention"
-      ]
+      ],
+      "Purchase Links": {
+        "Sulfur-based fungicide": "https://hydrobuilder.com/drexel-suffa-liquid-sulfur-fungicide-miticide-2-5-gallons.html"
+      }
     },
     {
       "PMI Value": "20-40",
@@ -23,7 +26,10 @@
         "Use lower end of rate range",
         "Emphasize orchard sanitation",
         "Prune for air circulation"
-      ]
+      ],
+      "Purchase Links": {
+        "Myclobutanil": "https://www.sunspotsupply.com/products/myclobutanil-20ew-t-o-fungicide-gallon-128-oz"
+      }
     },
     {
       "PMI Value": "40-60",
@@ -36,7 +42,12 @@
         "Alternate fungicide classes",
         "Begin more aggressive monitoring",
         "Ensure thorough coverage"
-      ]
+      ],
+      "Purchase Links": {
+        "Propiconazole": "https://www.lawnandpestcontrolsupply.com/products/propiconazole?variant=39299714515055",
+        "Sulfur-based fungicide": "https://hydrobuilder.com/drexel-suffa-liquid-sulfur-fungicide-miticide-2-5-gallons.html"
+      }
+
     },
     {
       "PMI Value": "60-80",
@@ -49,7 +60,11 @@
         "Use higher end of application rates",
         "Implement strict spray timing",
         "Consider resistance management (i.e. prioritizing appl)"
-      ]
+      ],
+      "Purchase Links": {
+        "Azoxystrobin": "https://chemicalwarehouse.com/products/azoxystrobin-2sc-ag-and-t-o",
+        "Tebuconazole": "https://www.atozlawnsupply.com/products/tebuconazole-3-6-select"
+      }
     },
     {
       "PMI Value": "80-100",
@@ -63,7 +78,12 @@
         "Immediate and overlapping treatments",
         "Prioritize complete orchard coverage",
         "Potential yield protection strategy"
-      ]
+      ],
+      "Purchase Links": {
+        "Trifloxystrobin": "https://www.forestrydistributing.com/compass-50-wg-fungicide-bayer",
+        "Myclobutanil": "https://www.sunspotsupply.com/products/myclobutanil-20ew-t-o-fungicide-gallon-128-oz",
+        "Sulfur-based fungicide": "https://hydrobuilder.com/drexel-suffa-liquid-sulfur-fungicide-miticide-2-5-gallons.html"
+      }
     }
   ]
   

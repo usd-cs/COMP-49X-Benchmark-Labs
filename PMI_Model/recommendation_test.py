@@ -59,6 +59,11 @@ def test_get_additional_notes():
     assert "Focus on cultural controls" in additional_notes
     assert "Minimal chemical intervention" in additional_notes
 
+def test_get_purchase_links():
+    purchase_links = Recommendation(70).get_purchase_links()
+    assert purchase_links["Azoxystrobin"] == "https://chemicalwarehouse.com/products/azoxystrobin-2sc-ag-and-t-o"
+    assert purchase_links["Tebuconazole"] == "https://www.atozlawnsupply.com/products/tebuconazole-3-6-select"
+
 def test_get_full_info():
     full_info = Recommendation(10).get_full_info()
     assert 'PMI Value:' in full_info
