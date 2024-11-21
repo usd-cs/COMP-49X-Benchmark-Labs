@@ -44,6 +44,9 @@ class Recommendation:
 
     def get_additional_notes(self):
         return self.json_data["Additional Notes"]
+    
+    def get_purchase_links(self):
+        return self.json_data["Purchase Links"]
 
     def get_full_info(self):
         data = ""
@@ -52,10 +55,15 @@ class Recommendation:
                 data += f"{key}:\n"
                 for item in value:
                     data += f"{item}\n"
+                data += "\n"
+            elif isinstance(value, dict):
+                data += f"{key}:\n"
+                for item, link in value.items():
+                    data += f"Purchase {item}: {link}\n" 
             else:
                 data += f"{key}: \n{value}\n\n"
 
         return data
 
-x = Recommendation(20)
+x = Recommendation(10)
 print(x.get_full_info())
