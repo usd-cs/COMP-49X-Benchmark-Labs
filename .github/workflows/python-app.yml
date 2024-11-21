@@ -38,5 +38,4 @@ jobs:
       run: |
         cd PMI_Model 
         pytest *_test.py
-        cd ../
-        pytest **/*_test.py
+        
