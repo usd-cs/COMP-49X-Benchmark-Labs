@@ -64,6 +64,3 @@ class Recommendation:
                 data += f"{key}: \n{value}\n\n"
 
         return data
-
-x = Recommendation(10)
-print(x.get_full_info())
