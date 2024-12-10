@@ -1,5 +1,6 @@
 from data import Data
 from datetime import datetime, timedelta
+from recommendation import Recommendation, InvalidPMI
 
 class Model:
     """
@@ -61,6 +62,8 @@ class Model:
             self.temperature_data = temperature_data
         else:
             self.temperature_data = self.data_obj.get_data()
+            
+        self.risk_index = None
 
     def get_risk_index(self):
         """
@@ -70,6 +73,7 @@ class Model:
         """
         start_day = self.data_obj.get_start_day(self.temperature_data, self.start_day, self.end_day)
         if start_day == -1:
+            self.risk_index = -1
             return -1
         curr_day = self.start_day
         index = 0
@@ -98,9 +102,28 @@ class Model:
                 index = 0 
 
             if curr_day == int(self.end_day):
+                self.risk_index = index
                 return index
 
             date_time = datetime.strptime(str(curr_day), "%Y%m%d")
             previous_day = date_time + timedelta(days=1)
             curr_day = int(previous_day.strftime("%Y%m%d")) # format to previous format
-
+            
+    def get_pesticide_recommendation(self):
+        """
+        Returns the pesticide recommendation based on the risk index
+        """
+        
+        # If risk index is not calculated, calculate it
+        if self.risk_index == None:
+            try:
+                self.get_risk_index()
+            except:
+                return "Unable to calculate risk index, please check your input data"
+        
+        # If risk index is still -1, return error message
+        if self.risk_index == -1:
+            return "Unable to calculate risk index, please check your input data"
+        
+        # Return the full recommendation info
+        return Recommendation(self.risk_index).get_full_info()

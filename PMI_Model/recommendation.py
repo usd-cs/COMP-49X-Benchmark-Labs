@@ -1,4 +1,5 @@
 import json
+import os
 
 class InvalidPMI(Exception):
     pass
@@ -6,7 +7,9 @@ class InvalidPMI(Exception):
 class Recommendation:
     def __init__(self, pmi_index):
         self.pmi = pmi_index
-        f = open('recommendations.json', 'r')
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        json_path = os.path.join(current_dir, 'recommendations.json')
+        f = open(json_path, 'r')
         self.json_data = self.create_recommendations(f)
 
     def create_recommendations(self, json_file):
