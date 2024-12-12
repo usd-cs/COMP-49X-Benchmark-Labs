@@ -84,9 +84,7 @@ class Data:
         curr_day = end_day
         continuous_days = 0
         while True:
-            print(curr_day)
             if self.check_consecutive_temp(temperature_data, curr_day):
-                print("adding")
                 continuous_days += 1
             else: 
                 if continuous_days >= 3:
