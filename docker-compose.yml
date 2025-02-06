@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  pmi-calculator:
+    build: .
+    container_name: pmi-calculator
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./PMI_Model:/app
