@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY PMI_Model/ .
 
-CMD ["python", "app.py"]
+CMD ["python", "test_docker.py"]
