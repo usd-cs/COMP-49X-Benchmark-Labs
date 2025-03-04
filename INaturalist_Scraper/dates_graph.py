@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import json
 from collections import Counter
 
-with open("observations.json", "r") as file:
+with open("./Data/true_observations.json", "r") as file:
     data = json.load(file)
 
 years = []
