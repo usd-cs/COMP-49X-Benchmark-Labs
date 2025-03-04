@@ -147,7 +147,7 @@ class Regression:
 
         response = requests.get(url, params=parameters)
         data = response.json()
-        print("a")
+        print("Made Request")
 
         temperatures_total = 0
         for temperature in data['properties']['parameter']['T2M'].values():
