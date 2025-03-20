@@ -75,11 +75,11 @@ def get_false_observations(true_observations):
     for i, observation in enumerate(true_observations):
         
         try:
-            # Set bounding box (10 miles radius of true observation)
-            params['swlat'] = observation['coordinates'][1] - 0.145
-            params['swlng'] = observation['coordinates'][0] - 0.226
-            params['nelat'] = observation['coordinates'][1] + 0.145
-            params['nelng'] = observation['coordinates'][0] + 0.226
+            # Set bounding box (~1 miles radius of true observation)
+            params['swlat'] = observation['coordinates'][1] - 0.04
+            params['swlng'] = observation['coordinates'][0] - 0.02
+            params['nelat'] = observation['coordinates'][1] + 0.04
+            params['nelng'] = observation['coordinates'][0] + 0.02
             
             print("Processing true observation", i)
             
