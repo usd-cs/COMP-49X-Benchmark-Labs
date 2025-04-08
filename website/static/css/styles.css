@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+#requestPMI {
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#results {
+    margin: 20px;
+}

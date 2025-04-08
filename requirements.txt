@@ -3,4 +3,7 @@ pytest
 datetime
 numpy
 matplotlib
-basemap
+flask
+pandas
+scikit-learn
+matplotlib
