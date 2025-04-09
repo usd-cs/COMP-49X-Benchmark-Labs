@@ -21,20 +21,60 @@ if not os.path.exists(model_path):
     print("Model file does not exist at the specified path.")
 model = joblib.load(model_path)  # Adjust the path as necessary
 
-NASA_API_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
 METEOS_API_URL = "https://api.open-meteo.com/v1/forecast"
 
+# Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
-    params = {
+    url = "https://power.larc.nasa.gov/api/temporal/hourly/point"
+    
+    print(f"Getting NASA data for {lat}, {lon} from {start_date} to {end_date}")
+    
+    param_list = ['T2M', 'RH2M', 'T2MDEW', 'PRECTOTCORR', 'TSOIL1', 'T2MWET']
+    parameters = {
+        "parameters": ",".join(param_list),
+        "community": "AG",
         "latitude": lat,
         "longitude": lon,
         "start": start_date,
         "end": end_date,
         "format": "JSON"
     }
-    response = requests.get(NASA_API_URL, params=params)
+    
+    curr_data = {}
+
+    response = requests.get(url, params=parameters)
     data = response.json()
-    return data
+    try:
+        for param in param_list:
+            curr_data[param] = data['properties']['parameter'][param]
+        return curr_data
+    except:
+        print(f"Error getting data")
+        return None
+
+# Save hourly NASA data into a dataframe, return dataframe
+def save_nasa_data(weather_data):
+    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Wind Speed', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Specific Humidity'])
+    dates = list(weather_data['T2M'].keys())
+    temp_values = list(weather_data['T2M'].values())
+    humidity_values = list(weather_data['RH2M'].values())
+    dew_frost_values = list(weather_data['T2MDEW'].values())
+    precipitation_values = list(weather_data['PRECTOTCORR'].values())
+    soil_temperature_values = list(weather_data['TSOIL1'].values())
+    wet_bulb_values = list(weather_data['T2MWET'].values())
+    curr_df = pd.DataFrame({
+        'Datetime': dates,
+        'Temperature': temp_values,
+        'Humidity': humidity_values,
+        'Precipitation': precipitation_values,
+        'Dew/Frost Point': dew_frost_values,
+        'Wet Bulb Temperature': wet_bulb_values,
+        'Soil Temperature': soil_temperature_values
+    })
+        
+    dataframe = pd.concat([dataframe, curr_df], ignore_index=True)
+    
+    return dataframe
 
 def get_meteos_data(lat, lon):
     params = {
@@ -47,35 +87,108 @@ def get_meteos_data(lat, lon):
     data = response.json()
     return data
 
+def calculate_aggregates(weather_subset, var_name, window_name, start_day, end_day):
+    # Filter data for given time window
+    window_data = weather_subset[(weather_subset['RelativeDay'] >= start_day) & (weather_subset['RelativeDay'] <= end_day)]
+    
+    # Calculate aggregate and return as a series
+    result = pd.Series({
+        f"{var_name}_{window_name}_mean": window_data[var_name].mean(),
+        f"{var_name}_{window_name}_min": window_data[var_name].min(),
+        f"{var_name}_{window_name}_max": window_data[var_name].max(),
+        f"{var_name}_{window_name}_median": window_data[var_name].median()
+    })
+    
+    return result
+
+# Process NASA dataframe into aggregate window features, return new dataframe
+def process_nasa_data(weather_df, timestamp):
+    
+    # convert datetime to same format as observations_df
+    weather_df['Datetime'] = pd.to_datetime(weather_df['Datetime'], format='%Y%m%d%H')
+    weather_df['Date'] = weather_df['Datetime'].dt.date
+
+    # Calculate difference between observation date and weather date
+    def get_relative_day(row):
+        obs_date = pd.to_datetime(timestamp)
+        this_date = pd.to_datetime(row['Date'])
+        difference = (this_date - obs_date).days
+        return difference
+    
+    # Apply the function to get relative day
+    weather_df['RelativeDay'] = weather_df.apply(get_relative_day, axis=1)
+
+    # Variables to calculate aggregations for
+    weather_vars = ['Temperature', 'Humidity', 'Precipitation', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Soil Temperature']
+
+    # Time windows to aggregate over (days before and after the observation day)
+    time_windows = {
+        'day_of': (0, 0),
+        'day_before_after': (-1, 0),
+        'two_days': (-2, 0),
+        'three_days': (-3, 0),
+        'one_week': (-7, 0),
+        'two_week': (-14, 0),
+        'three_week': (-21, 0)
+    }
+    
+    # Dictionary to store aggregated values
+    features = {}
+    
+    # Iterate over all weather data variables
+    for var in weather_vars:
+        # iterate over all items in time_windows
+        for window_name, (start_day, end_day) in time_windows.items():
+            # Filter data for given time window
+            window_data = weather_df[(weather_df['RelativeDay'] >= start_day) & (weather_df['RelativeDay'] <= end_day)]
+            
+            # Calculate aggregates
+            features[f"{var}_{window_name}_mean"] = window_data[var].mean()
+            features[f"{var}_{window_name}_min"] = window_data[var].min()
+            features[f"{var}_{window_name}_max"] = window_data[var].max()
+            features[f"{var}_{window_name}_median"] = window_data[var].median()
+
+    # Create DataFrame from results
+    features_df = pd.DataFrame([features])
+    
+    # Add day of year feature based on timestamp
+    day_of_year = pd.to_datetime(timestamp).dayofyear
+    features['day_of_year'] = day_of_year
+    
+    # Update the features DataFrame with the new feature
+    features_df = pd.DataFrame([features])
+
+    print(f"Created {len(features)} features")
+    
+    return features_df
+
 @app.route('/predict', methods=['POST'])
 def predict():
+    
+    # Request data from client
     data = request.get_json()
     print("Received data:", data)
     lat = data['latitude']
     lon = data['longitude']
     timestamp = data['timestamp']
 
-    # Get NASA data for the past two weeks
+    # Get NASA data for the past three weeks
     end_date = datetime.strptime(timestamp, "%Y-%m-%d")
-    start_date = end_date - timedelta(days=14)
+    start_date = end_date - timedelta(days=21)
     nasa_data = get_nasa_data(lat, lon, start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
-
-    # Get Meteos data for the next 14 days
-    meteos_data = get_meteos_data(lat, lon)
-
-    # Combine data and make predictions
-    predictions = []
-    for i in range(0, 14*4, 6):
-        # Combine NASA and Meteos data
-        combined_data = combine_data(nasa_data, meteos_data, i)
-        prediction = model.predict(combined_data)
-        predictions.append({
-            "timestamp": (end_date + timedelta(hours=i)).strftime("%Y-%m-%d %H:%M:%S"),
-            "confidence_interval": prediction
-        })
-
-    print("Predictions:", predictions)
-    return jsonify(predictions)
+    nasa_df = save_nasa_data(nasa_data)
+    
+    # Process NASA data into features
+    features_df = process_nasa_data(nasa_df, timestamp)
+        
+    # Make prediction
+    prediction = model.predict(features_df)[0]
+    confidence = model.predict_proba(features_df)[0][1]  # Probability of True class
+    
+    return jsonify({
+        'prediction': bool(prediction),
+        'confidence': float(confidence)
+    })
 
 def combine_data(nasa_data, meteos_data, hours_ahead):
     # Combine the data from NASA and Meteos
@@ -84,15 +197,4 @@ def combine_data(nasa_data, meteos_data, hours_ahead):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-    # Test the API
-    url = 'http://127.0.0.1:5000/predict'
-    data = {
-        'latitude': 51.505,
-        'longitude': -0.09,
-        'timestamp': '2025-04-06'
-    }
-    response = requests.post(url, json=data)
-    print("Status Code:", response.status_code)
-    print("Response JSON:", response.json())
 
