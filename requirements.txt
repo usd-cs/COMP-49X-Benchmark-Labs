@@ -1,6 +1,6 @@
 requests
 pytest
 datetime
-numpy
+numpy==1.24.3
 matplotlib
 basemap
