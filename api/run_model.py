@@ -76,16 +76,63 @@ def save_nasa_data(weather_data):
     
     return dataframe
 
+# Fetch forecasted weather data from Meteos API, returns hourly data
 def get_meteos_data(lat, lon):
-    params = {
+    url = "https://api.open-meteo.com/v1/forecast"
+    
+    param_list = ['temperature_2m', 'relative_humidity_2m', 'dew_point_2m', 'precipitation', 'soil_temperature_6cm', 'wet_bulb_temperature_2m']
+    
+    parameters = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": "temperature_2m,relative_humidity_2m,wind_speed_10m,dew_point_2m",
-        "forecast_days": 16
+        "hourly": ",".join(param_list),
+        "forecast_days": 14
     }
-    response = requests.get(METEOS_API_URL, params=params)
+    
+    curr_data = {}
+
+    response = requests.get(url, params=parameters)
     data = response.json()
-    return data
+    try:
+        for param in param_list:
+            curr_data[param] = data['hourly'][param]
+                    
+        # Convert datetime strings to proper format
+        formatted_datetimes = []
+        for dt_str in data['hourly']['time']:
+            converted_date = (datetime.strptime(dt_str, "%Y-%m-%dT%H:%M")).strftime("%Y%m%d%H")
+            formatted_datetimes.append(converted_date)
+        
+        curr_data['Datetime'] = formatted_datetimes
+                
+        return curr_data
+    except:
+        print(f"Error getting data")
+        return None
+
+# Save hourly forecasted Meteos data into a dataframe, return dataframe
+def save_meteos_data(weather_data):
+    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Wind Speed', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Specific Humidity'])
+    dates = list(weather_data['Datetime'])
+    temp_values = list(weather_data['temperature_2m'])
+    humidity_values = list(weather_data['relative_humidity_2m'])
+    dew_frost_values = list(weather_data['dew_point_2m'])
+    precipitation_values = list(weather_data['precipitation'])
+    soil_temperature_values = list(weather_data['soil_temperature_6cm'])
+    wet_bulb_values = list(weather_data['wet_bulb_temperature_2m'])
+    curr_df = pd.DataFrame({
+        'Datetime': dates,
+        'Temperature': temp_values,
+        'Humidity': humidity_values,
+        'Precipitation': precipitation_values,
+        'Dew/Frost Point': dew_frost_values,
+        'Wet Bulb Temperature': wet_bulb_values,
+        'Soil Temperature': soil_temperature_values
+    })
+        
+    dataframe = pd.concat([dataframe, curr_df], ignore_index=True)
+    
+    return dataframe
 
 def calculate_aggregates(weather_subset, var_name, window_name, start_day, end_day):
     # Filter data for given time window
@@ -162,6 +209,7 @@ def process_nasa_data(weather_df, timestamp):
     
     return features_df
 
+# Take location and time, return prediction and confidence
 @app.route('/predict', methods=['POST'])
 def predict():
     
