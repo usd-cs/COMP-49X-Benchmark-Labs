@@ -5,7 +5,7 @@ def test_api():
     data = {
         'latitude': 51.505,
         'longitude': -0.09,
-        'timestamp': '2025-04-06'
+        'timestamp': '2025-04-09'
     }
     response = requests.post(url, json=data)
     print("\nTest Results:")

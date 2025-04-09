@@ -54,7 +54,7 @@ def get_nasa_data(lat, lon, start_date, end_date):
 
 # Save hourly NASA data into a dataframe, return dataframe
 def save_nasa_data(weather_data):
-    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Wind Speed', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Specific Humidity'])
+    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Precipitation', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Soil Temperature'])
     dates = list(weather_data['T2M'].keys())
     temp_values = list(weather_data['T2M'].values())
     humidity_values = list(weather_data['RH2M'].values())
@@ -112,7 +112,7 @@ def get_meteos_data(lat, lon):
 
 # Save hourly forecasted Meteos data into a dataframe, return dataframe
 def save_meteos_data(weather_data):
-    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Wind Speed', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Specific Humidity'])
+    dataframe = pd.DataFrame(columns=['Datetime', 'Temperature', 'Humidity', 'Precipitation', 'Dew/Frost Point', 'Wet Bulb Temperature', 'Soil Temperature'])
     dates = list(weather_data['Datetime'])
     temp_values = list(weather_data['temperature_2m'])
     humidity_values = list(weather_data['relative_humidity_2m'])
@@ -225,7 +225,17 @@ def predict():
     start_date = end_date - timedelta(days=21)
     nasa_data = get_nasa_data(lat, lon, start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
     nasa_df = save_nasa_data(nasa_data)
+
+    # Save NASA data to CSV
+    nasa_df.to_csv('nasa_data.csv', index=False)
     
+    # Get Meteos data for the next two weeks
+    meteos_data = get_meteos_data(lat, lon)
+    meteos_df = save_meteos_data(meteos_data)
+    
+    # Save Meteos data to CSV
+    meteos_df.to_csv('meteos_data.csv', index=False)
+
     # Process NASA data into features
     features_df = process_nasa_data(nasa_df, timestamp)
         
