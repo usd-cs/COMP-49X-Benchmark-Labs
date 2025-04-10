@@ -12,7 +12,7 @@ import joblib
 app = Flask(__name__)
 
 # Load your trained model
-model_path = 'Notebook/model.randomforest'
+model_path = 'Notebook/model.knn'
 
 #for troubleshooting
 print("Model Path:", model_path) 
@@ -175,8 +175,7 @@ def process_data(weather_df, timestamp):
         'two_days': (-2, 0),
         'three_days': (-3, 0),
         'one_week': (-7, 0),
-        'two_week': (-14, 0),
-        'three_week': (-21, 0)
+        'two_week': (-14, 0)
     }
     
     # Dictionary to store aggregated values
@@ -255,8 +254,10 @@ def predict():
         features_df = process_data(combined_df, curr_time)
         
         # Predict, get response and confidence of True (PMI)
-        prediction = model.predict(features_df)[0]
-        confidence = model.predict_proba(features_df)[0][1]
+        # Convert DataFrame to numpy array to drop feature names
+        features_array = features_df.values
+        prediction = model.predict(features_array)[0]
+        confidence = model.predict_proba(features_array)[0][1]
         
         # Save results
         results.append({
