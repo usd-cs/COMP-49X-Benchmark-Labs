@@ -3,4 +3,7 @@ pytest
 datetime
 numpy==1.24.3
 matplotlib
-basemap
+flask
+pandas
+scikit-learn
+matplotlib
