@@ -149,7 +149,7 @@ def calculate_aggregates(weather_subset, var_name, window_name, start_day, end_d
     return result
 
 # Process NASA dataframe into aggregate window features, return new dataframe
-def process_nasa_data(weather_df, timestamp):
+def process_data(weather_df, timestamp):
     
     # convert datetime to same format as observations_df
     weather_df['Datetime'] = pd.to_datetime(weather_df['Datetime'], format='%Y%m%d%H')
@@ -204,8 +204,6 @@ def process_nasa_data(weather_df, timestamp):
     
     # Update the features DataFrame with the new feature
     features_df = pd.DataFrame([features])
-
-    print(f"Created {len(features)} features")
     
     return features_df
 
@@ -225,33 +223,51 @@ def predict():
     start_date = end_date - timedelta(days=21)
     nasa_data = get_nasa_data(lat, lon, start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
     nasa_df = save_nasa_data(nasa_data)
-
-    # Save NASA data to CSV
-    nasa_df.to_csv('nasa_data.csv', index=False)
     
     # Get Meteos data for the next two weeks
     meteos_data = get_meteos_data(lat, lon)
     meteos_df = save_meteos_data(meteos_data)
+            
+    # Concatenate the dataframes
+    combined_df = pd.concat([nasa_df, meteos_df])
     
-    # Save Meteos data to CSV
-    meteos_df.to_csv('meteos_data.csv', index=False)
-
-    # Process NASA data into features
-    features_df = process_nasa_data(nasa_df, timestamp)
+    # When Datetime is the same, keep the meteos_df row by dropping duplicates
+    # and keeping the last occurrence (meteos_df rows come after nasa_df rows in the concatenated dataframe)
+    combined_df = combined_df.drop_duplicates(subset='Datetime', keep='last')
+    
+    # Sort by Datetime to maintain chronological order
+    combined_df = combined_df.sort_values('Datetime')
         
-    # Make prediction
-    prediction = model.predict(features_df)[0]
-    confidence = model.predict_proba(features_df)[0][1]  # Probability of True class
+    # Process data and make predictions for the next 7 days at 12-hour intervals
+    results = []
     
-    return jsonify({
-        'prediction': bool(prediction),
-        'confidence': float(confidence)
-    })
-
-def combine_data(nasa_data, meteos_data, hours_ahead):
-    # Combine the data from NASA and Meteos
-    # This function needs to be implemented based on your model's requirements
-    pass
+    # Convert timestamp to datetime object
+    base_datetime = datetime.strptime(timestamp, "%Y-%m-%d")
+    
+    #  Predict for 7 days, 12-hour intervals (14 steps)
+    for step in range(15): 
+        
+        # Convert step to hours and add to current time
+        hours_ahead = step * 12
+        curr_time = base_datetime + timedelta(hours=hours_ahead)
+        
+        # Get aggregate features at this time
+        features_df = process_data(combined_df, curr_time)
+        
+        # Predict, get response and confidence of True (PMI)
+        prediction = model.predict(features_df)[0]
+        confidence = model.predict_proba(features_df)[0][1]
+        
+        # Save results
+        results.append({
+            'step': step,
+            'timestamp': curr_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'prediction': bool(prediction),
+            'confidence': float(confidence)
+        })
+    
+    # Return to API query
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(debug=True)
