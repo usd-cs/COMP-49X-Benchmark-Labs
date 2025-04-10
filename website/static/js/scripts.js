@@ -50,11 +50,14 @@ document.addEventListener('DOMContentLoaded', function () {
             var predictionHeader = document.createElement('th');
             predictionHeader.textContent = 'Prediction';
             var confidenceHeader = document.createElement('th');
-            confidenceHeader.textContent = 'Confidence';
+            confidenceHeader.textContent = 'Confidence (Adjusted)';
+            var rawConfidenceHeader = document.createElement('th');
+            rawConfidenceHeader.textContent = 'Raw Confidence';
             
             headerRow.appendChild(timestampHeader);
             headerRow.appendChild(predictionHeader);
             headerRow.appendChild(confidenceHeader);
+            headerRow.appendChild(rawConfidenceHeader);
             table.appendChild(headerRow);
 
             // Add data rows
@@ -88,9 +91,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 confidenceCell.textContent = confidenceValue;
                 confidenceCell.appendChild(confidenceBar);
                 
+                var rawConfidenceCell = document.createElement('td');
+                var rawConfidenceValue = (result.raw_confidence * 100).toFixed(2) + '%';
+                rawConfidenceCell.textContent = rawConfidenceValue;
+                
                 row.appendChild(timestampCell);
                 row.appendChild(predictionCell);
                 row.appendChild(confidenceCell);
+                row.appendChild(rawConfidenceCell);
                 table.appendChild(row);
             });
 
@@ -105,10 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
             chartContainer.appendChild(canvas);
             resultsDiv.appendChild(chartContainer);
             
-            // Create chart
+            // Create chart with both confidence metrics
             var ctx = canvas.getContext('2d');
             var timeLabels = data.map(item => item.timestamp);
             var confidenceData = data.map(item => item.confidence);
+            var rawConfidenceData = data.map(item => item.raw_confidence);
             var colors = data.map(item => item.prediction ? 
                 `rgba(0, 128, 0, ${item.confidence})` : 
                 `rgba(255, 0, 0, ${item.confidence})`);
@@ -117,14 +126,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 type: 'line',
                 data: {
                     labels: timeLabels,
-                    datasets: [{
-                        label: 'Confidence Over Time',
-                        data: confidenceData,
-                        backgroundColor: colors,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        fill: false
-                    }]
+                    datasets: [
+                        {
+                            label: 'Adjusted Confidence',
+                            data: confidenceData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Raw Confidence',
+                            data: rawConfidenceData,
+                            borderColor: 'rgba(192, 75, 75, 1)',
+                            backgroundColor: 'rgba(192, 75, 75, 0.2)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
