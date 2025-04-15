@@ -8,6 +8,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import joblib
+import csv
+import pymongo
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -22,6 +28,7 @@ if not os.path.exists(model_path):
 model = joblib.load(model_path)  # Adjust the path as necessary
 
 METEOS_API_URL = "https://api.open-meteo.com/v1/forecast"
+MONGODB_URI = os.getenv("MONGODB_URI")
 
 # Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
@@ -272,6 +279,81 @@ def predict():
     
     # Return to API query
     return jsonify(results)
+
+# Allow users to upload their powdery mildew observations, use for training
+@app.route('/upload', methods=['POST'])
+def upload():
+    data = request.get_json()
+    
+    try:
+        coords = data['coordinates']
+        timestamp = data['timestamp']
+        
+        # Create document for MongoDB
+        observation = {
+            "coordinates": coords,
+            "timestamp": timestamp
+        }
+        
+        # Connect to MongoDB and upload the data
+        client = pymongo.MongoClient(MONGODB_URI)
+        db = client.pmi_data
+        collection = db.observations
+        
+        # Insert the observation
+        collection.insert_one(observation)
+        client.close()
+        
+        return jsonify({"message": "Data received and uploaded to MongoDB"})
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Allow users to upload bulk observations as CSV
+@app.route('/upload_bulk', methods=['POST'])
+def upload_bulk():
+        
+    file = request.files['file']
+        
+    try:
+        # Read the CSV file
+        csv_data = []
+        csv_file = file.read().decode('utf-8').splitlines()
+        csv_reader = csv.reader(csv_file)
+        
+        # Skip header if it exists
+        header = next(csv_reader, None)
+        
+        # Process each row
+        for row in csv_reader:
+            coordinates = row[0]
+            timestamp = row[1]
+            
+            # Add to our data collection
+            csv_data.append({
+                "coordinates": coordinates,
+                "timestamp": timestamp
+            })
+        
+        # Connect to MongoDB and upload the data
+        client = pymongo.MongoClient(MONGODB_URI)
+        db = client.pmi_data
+        collection = db.observations
+        
+        # Insert the processed data
+        if csv_data:
+            collection.insert_many(csv_data)
+            client.close()
+        
+        # Return the processed data
+        return jsonify({
+            "message": "CSV processed successfully and uploaded to MongoDB",
+            "data": csv_data,
+            "count": len(csv_data)
+        })
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
