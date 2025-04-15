@@ -86,6 +86,7 @@ def get_meteos_data(lat, lon):
         "latitude": lat,
         "longitude": lon,
         "hourly": ",".join(param_list),
+        "past_days": 7,
         "forecast_days": 14
     }
     
@@ -217,9 +218,11 @@ def predict():
     lon = data['longitude']
     timestamp = data['timestamp']
 
-    # Get NASA data for the past three weeks
+    # Get NASA data for the past 3 weeks - 1 week ago
     end_date = datetime.strptime(timestamp, "%Y-%m-%d")
     start_date = end_date - timedelta(days=21)
+    end_date = end_date - timedelta(days=7)
+
     nasa_data = get_nasa_data(lat, lon, start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
     nasa_df = save_nasa_data(nasa_data)
     
@@ -236,7 +239,7 @@ def predict():
     
     # Sort by Datetime to maintain chronological order
     combined_df = combined_df.sort_values('Datetime')
-        
+
     # Process data and make predictions for the next 7 days at 12-hour intervals
     results = []
     
