@@ -257,8 +257,10 @@ def predict():
         features_df = process_data(combined_df, curr_time)
         
         # Predict, get response and confidence of True (PMI)
-        prediction = model.predict(features_df)[0]
-        confidence = model.predict_proba(features_df)[0][1]
+        # Convert DataFrame to numpy array to drop feature names
+        features_array = features_df.values
+        prediction = model.predict(features_array)[0]
+        confidence = model.predict_proba(features_array)[0][1]
         
         # Save results
         results.append({

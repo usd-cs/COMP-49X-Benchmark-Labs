@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chartContainer.appendChild(canvas);
             resultsDiv.appendChild(chartContainer);
             
-            // Create chart with confidence metrics
+            // Create chart
             var ctx = canvas.getContext('2d');
             var timeLabels = data.map(item => item.timestamp);
             var confidenceData = data.map(item => item.confidence);
@@ -117,16 +117,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 type: 'line',
                 data: {
                     labels: timeLabels,
-                    datasets: [
-                        {
-                            label: 'Confidence',
-                            data: confidenceData,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 2,
-                            fill: false
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Confidence Over Time',
+                        data: confidenceData,
+                        backgroundColor: colors,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
                 },
                 options: {
                     responsive: true,
