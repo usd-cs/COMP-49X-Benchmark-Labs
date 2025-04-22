@@ -8,11 +8,27 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <h1 class="title">Powdery Mildew Forecaster</h1>
     <div id="map"></div>
-    <button id="requestPMI">Request PMI</button>
-    <div id="results"></div>
+    <div class="button-container">
+        <button id="requestPMI" class="action-button">Request PMI</button>
+        <button id="reportMildew" class="action-button">Report Powdery Mildew</button>
+    </div>
+    <div id="results" class="hidden"></div>
+
+    <!-- Modal for date picker -->
+    <div id="dateModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Observation Date</h2>
+            <input type="date" id="observationDate">
+            <button id="submitDate" class="action-button">Submit</button>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
