@@ -154,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var span = document.getElementsByClassName('close')[0];
     var submitDateButton = document.getElementById('submitDate');
     var observationDateInput = document.getElementById('observationDate');
+    var finishCard = document.getElementById('finishCard');
 
     document.getElementById('reportMildew').addEventListener('click', function () {
         if (!marker) {
@@ -183,14 +184,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var latlng = marker.getLatLng();
         var timestamp = observationDateInput.value;
 
-        fetch('/report', {
+        fetch('/upload', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                latitude: latlng.lat,
-                longitude: latlng.lng,
+                coordinates: [latlng.lat, latlng.lng],
                 timestamp: timestamp
             })
         })
@@ -198,6 +198,10 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             alert('Report submitted successfully.');
             modal.style.display = 'none';
+            finishCard.classList.remove('hidden');
+        })
+        .catch(error => {
+            alert('Error submitting report: ' + error.message);
         });
     });
 });
