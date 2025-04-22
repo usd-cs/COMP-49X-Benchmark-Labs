@@ -6,4 +6,7 @@ matplotlib
 flask
 pandas
 scikit-learn
-matplotlib
+joblib
+csv
+pymongo
+uvicorn==0.17.6
