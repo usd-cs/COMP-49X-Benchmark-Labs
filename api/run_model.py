@@ -1,6 +1,4 @@
 import os
-print("Current Working Directory:", os.getcwd()) #for troubleshooting
-
 from flask import Flask, request, jsonify
 import requests
 import pandas as pd
@@ -10,25 +8,14 @@ from datetime import datetime, timedelta
 import joblib
 import csv
 import pymongo
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 app = Flask(__name__)
 
-# Load your trained model
-model_path = 'Notebook/model.knn'
+# Load trained model
+model = joblib.load('Notebook/model.knn')
 
-#for troubleshooting
-print("Model Path:", model_path) 
-print("Absolute Model Path:", os.path.abspath(model_path))
-if not os.path.exists(model_path):
-    print("Model file does not exist at the specified path.")
-model = joblib.load(model_path)  # Adjust the path as necessary
-
-METEOS_API_URL = "https://api.open-meteo.com/v1/forecast"
-MONGODB_URI = os.getenv("MONGODB_URI")
+# I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
+MONGODB_URI = "MONGODB_URI=mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload"
 
 # Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
