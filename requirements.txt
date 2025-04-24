@@ -7,6 +7,5 @@ flask
 pandas
 scikit-learn
 joblib
-csv
 pymongo
 uvicorn==0.17.6
