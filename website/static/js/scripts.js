@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (marker) {
             map.removeLayer(marker);
         }
-        marker = L.marker(e.latlng).addTo(map);
+        marker = L.marker(e.latlng, { draggable: true }).addTo(map);
     });
 
     document.getElementById('requestPMI').addEventListener('click', function () {
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             var resultsDiv = document.getElementById('results');
+            resultsDiv.classList.remove('hidden');
             resultsDiv.innerHTML = '<h2>Prediction Results</h2>';
             
             // Create table for results
@@ -146,6 +147,61 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             });
+        });
+    });
+
+    var modal = document.getElementById('dateModal');
+    var span = document.getElementsByClassName('close')[0];
+    var submitDateButton = document.getElementById('submitDate');
+    var observationDateInput = document.getElementById('observationDate');
+    var finishCard = document.getElementById('finishCard');
+
+    document.getElementById('reportMildew').addEventListener('click', function () {
+        if (!marker) {
+            alert('Please select a location on the map.');
+            return;
+        }
+
+        // Set the default date to today
+        var today = new Date().toISOString().split('T')[0];
+        observationDateInput.value = today;
+
+        // Show the modal
+        modal.style.display = 'block';
+    });
+
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    submitDateButton.addEventListener('click', function () {
+        var latlng = marker.getLatLng();
+        var timestamp = observationDateInput.value;
+
+        fetch('/upload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                coordinates: [latlng.lat, latlng.lng],
+                timestamp: timestamp
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Report submitted successfully.');
+            modal.style.display = 'none';
+            finishCard.classList.remove('hidden');
+        })
+        .catch(error => {
+            alert('Error submitting report: ' + error.message);
         });
     });
 });
