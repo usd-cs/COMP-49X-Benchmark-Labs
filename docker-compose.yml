@@ -3,11 +3,24 @@ version: '3.8'
 services:
   api:
     build: .
-    container_name: pmi-calculator
+    container_name: pmi-calculator-api
     ports:
       - "8000:8000"
     environment:
       - PORT=8000
       - MODEL_PATH=Notebook/model.knn
       - MONGODB_URI=mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload
+    restart: always
+
+  website:
+    build: .
+    container_name: pmi-calculator-website
+    ports:
+      - "5000:5000"
+    environment:
+      - WEBSITE_PORT=5000
+      - API_URL=http://api:8000
+    command: ["python", "website/website.py"]
+    depends_on:
+      - api
     restart: always
