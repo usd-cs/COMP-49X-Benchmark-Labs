@@ -15,7 +15,7 @@ app = Flask(__name__)
 model = joblib.load('Notebook/model.knn')
 
 # I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
-MONGODB_URI = "MONGODB_URI=mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload"
+MONGODB_URI = "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload"
 
 # Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
@@ -271,7 +271,7 @@ def predict():
 @app.route('/upload', methods=['POST'])
 def upload():
     data = request.get_json()
-    
+        
     try:
         coords = data['coordinates']
         timestamp = data['timestamp']
