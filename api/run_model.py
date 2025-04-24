@@ -272,7 +272,7 @@ def predict():
 @app.route('/upload', methods=['POST'])
 def upload():
     data = request.get_json()
-    
+        
     try:
         coords = data['coordinates']
         timestamp = data['timestamp']
