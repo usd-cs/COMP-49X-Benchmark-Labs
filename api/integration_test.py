@@ -1,16 +1,25 @@
-import pytest
 import requests
 import json
 
+def test_upload():
+    url = 'http://127.0.0.1:5000/upload'
+    data = {
+        'coordinates': [32.782607, -117.193877],
+        'timestamp': '2025-04-15'
+    }
 
+    response = requests.post(url, json=data)
 
-def test_integration():
-    # data is from clicking center of the map on the website
-    data = {'latitude': 39.842286020743394, 'longitude': -98.61328125, 'timestamp': '2025-04-11'}
-    response = requests.post('http://127.0.0.1:5000/predict', json=data)
-    
-    # check response is 200 OK response
     assert response.status_code == 200
-    # check response is the correct response that it should be
-    correct_response =  json.load(open('api/correct_response.json'))
-    assert response.json() == correct_response
+    assert response.json().get('message') == 'Data received and uploaded to MongoDB'
+
+def test_upload_bulk():
+    url = 'http://127.0.0.1:5000/upload_bulk'
+    filename = "api/test.csv"
+    data = {
+        'file': ('api/test.csv', open(filename, 'rb'), 'text/csv'),
+    }
+    response = requests.post(url, files=data)
+    assert response.status_code == 200
+    assert response.json().get('message') == "Data received and uploaded to MongoDB"
+
