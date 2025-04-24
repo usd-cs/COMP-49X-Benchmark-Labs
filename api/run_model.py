@@ -304,6 +304,7 @@ def upload_bulk():
     file = request.files['file']
         
     try:
+                
         # Read the CSV file
         csv_data = []
         csv_file = file.read().decode('utf-8').splitlines()
@@ -314,14 +315,17 @@ def upload_bulk():
         
         # Process each row
         for row in csv_reader:
-            coordinates = row[0]
-            timestamp = row[1]
-            
+            lat = row[0]
+            lon = row[1]
+            timestamp = row[2]
+                
             # Add to our data collection
             csv_data.append({
-                "coordinates": coordinates,
+                "coordinates": [float(lat), float(lon)],
                 "timestamp": timestamp
             })
+            
+        print(csv_data)
         
         # Connect to MongoDB and upload the data
         client = pymongo.MongoClient(MONGODB_URI)
@@ -333,12 +337,7 @@ def upload_bulk():
             collection.insert_many(csv_data)
             client.close()
         
-        # Return the processed data
-        return jsonify({
-            "message": "CSV processed successfully and uploaded to MongoDB",
-            "data": csv_data,
-            "count": len(csv_data)
-        })
+        return jsonify({"message": "Data received and uploaded to MongoDB"})
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
