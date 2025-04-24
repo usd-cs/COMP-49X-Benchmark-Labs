@@ -12,10 +12,11 @@ import pymongo
 app = Flask(__name__)
 
 # Load trained model
-model = joblib.load('Notebook/model.knn')
+model_path = os.environ.get('MODEL_PATH', 'Notebook/model.knn')
+model = joblib.load(model_path)
 
 # I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
-MONGODB_URI = "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload"
+MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload")
 
 # Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
@@ -303,6 +304,7 @@ def upload_bulk():
     file = request.files['file']
         
     try:
+                
         # Read the CSV file
         csv_data = []
         csv_file = file.read().decode('utf-8').splitlines()
@@ -313,15 +315,16 @@ def upload_bulk():
         
         # Process each row
         for row in csv_reader:
-            coordinates = row[0]
-            timestamp = row[1]
-            
+            lat = row[0]
+            lon = row[1]
+            timestamp = row[2]
+                
             # Add to our data collection
             csv_data.append({
-                "coordinates": coordinates,
+                "coordinates": [float(lat), float(lon)],
                 "timestamp": timestamp
             })
-        
+                    
         # Connect to MongoDB and upload the data
         client = pymongo.MongoClient(MONGODB_URI)
         db = client.pmi_data
@@ -332,15 +335,11 @@ def upload_bulk():
             collection.insert_many(csv_data)
             client.close()
         
-        # Return the processed data
-        return jsonify({
-            "message": "CSV processed successfully and uploaded to MongoDB",
-            "data": csv_data,
-            "count": len(csv_data)
-        })
+        return jsonify({"message": "Data received and uploaded to MongoDB"})
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port, debug=False)
