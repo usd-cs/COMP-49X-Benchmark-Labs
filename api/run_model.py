@@ -324,9 +324,7 @@ def upload_bulk():
                 "coordinates": [float(lat), float(lon)],
                 "timestamp": timestamp
             })
-            
-        print(csv_data)
-        
+                    
         # Connect to MongoDB and upload the data
         client = pymongo.MongoClient(MONGODB_URI)
         db = client.pmi_data
