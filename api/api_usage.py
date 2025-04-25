@@ -35,7 +35,7 @@ def test_upload_bulk():
     
     # Open file in binary mode for multipart/form-data
     files = {
-        'file': ('test.csv', open('test.csv', 'rb'), 'text/csv')
+        'file': ('api/test.csv', open('api/test.csv', 'rb'), 'text/csv')
     }
     
     response = requests.post(url, files=files)
