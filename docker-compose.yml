@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api:
     build: .
@@ -16,11 +14,13 @@ services:
     build: .
     container_name: pmi-calculator-website
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
-      - WEBSITE_PORT=5000
+      - WEBSITE_PORT=5001
       - API_URL=http://api:8000
-    command: ["python", "website/website.py"]
+      - FLASK_APP=website.website:app
+    working_dir: /
+    command: ["flask", "run", "--host=0.0.0.0", "--port=5001"]
     depends_on:
       - api
     restart: always
