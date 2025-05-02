@@ -202,6 +202,28 @@ def process_data(weather_df, timestamp):
     
     return features_df
 
+def find_category(prediction, confidence):
+    if prediction:
+        if confidence > 0.90:
+            return "Extremely High"
+        elif confidence > 0.75:
+            return "Very High"
+        elif confidence > 0.55:
+            return "High"
+        else:
+            return "Medium"
+    else:
+        if confidence > 0.90:
+            return "Extremely Low"
+        elif confidence > 0.75:
+            return "Very Low"
+        elif confidence > 0.55:
+            return "Low"
+        else:
+            return "Medium"
+        
+        
+
 # Take location and time, return prediction and confidence
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -254,15 +276,22 @@ def predict():
         # Predict, get response and confidence of True (PMI)
         # Convert DataFrame to numpy array to drop feature names
         features_array = features_df.values
+        # prediction is array of classes [False] or [True]
         prediction = model.predict(features_array)[0]
-        confidence = model.predict_proba(features_array)[0][1]
-        
+        # returns list of probabilities for each class [x,y] where x is probability of False and y is probability of True
+        confidences = model.predict_proba(features_array)[0]
+        if prediction:
+            confidence = confidences[1]
+        else:
+            confidence = confidences[0]
+
         # Save results
         results.append({
             'step': step,
             'timestamp': curr_time.strftime("%Y-%m-%d %H:%M:%S"),
             'prediction': bool(prediction),
-            'confidence': float(confidence)
+            'confidence': float(confidence),
+            'category': find_category(prediction, confidence)
         })
     
     # Return to API query

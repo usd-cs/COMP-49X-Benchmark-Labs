@@ -1,0 +1,93 @@
+[
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 0,
+      "timestamp": "2025-04-11 00:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 1,
+      "timestamp": "2025-04-11 12:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 2,
+      "timestamp": "2025-04-12 00:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 3,
+      "timestamp": "2025-04-12 12:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 4,
+      "timestamp": "2025-04-13 00:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 5,
+      "timestamp": "2025-04-13 12:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 6,
+      "timestamp": "2025-04-14 00:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 7,
+      "timestamp": "2025-04-14 12:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 8,
+      "timestamp": "2025-04-15 00:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 9,
+      "timestamp": "2025-04-15 12:00:00"
+    },
+    {
+      "confidence": 0.2,
+      "prediction": false,
+      "step": 10,
+      "timestamp": "2025-04-16 00:00:00"
+    },
+    {
+      "confidence": 0.0,
+      "prediction": false,
+      "step": 11,
+      "timestamp": "2025-04-16 12:00:00"
+    },
+    {
+      "confidence": 0.0,
+      "prediction": false,
+      "step": 12,
+      "timestamp": "2025-04-17 00:00:00"
+    },
+    {
+      "confidence": 0.4,
+      "prediction": false,
+      "step": 13,
+      "timestamp": "2025-04-17 12:00:00"
+    },
+    {
+      "confidence": 0.4,
+      "prediction": false,
+      "step": 14,
+      "timestamp": "2025-04-18 00:00:00"
+    }
+  ]
+  
