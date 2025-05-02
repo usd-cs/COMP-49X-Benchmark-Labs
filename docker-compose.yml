@@ -3,9 +3,9 @@ services:
     build: .
     container_name: pmi-calculator-api
     ports:
-      - "3456:3456"
+      - "9000:8000"
     environment:
-      - PORT=3456
+      - PORT=8000
       - MODEL_PATH=Notebook/model.knn
       - MONGODB_URI=mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload
     restart: always
@@ -14,10 +14,10 @@ services:
     build: .
     container_name: pmi-calculator-website
     ports:
-      - "8080:8080"
+      - "9080:8080"
     environment:
       - WEBSITE_PORT=8080
-      - API_URL=http://api:3456
+      - API_URL=http://api:8000
       - FLASK_APP=website.website:app
     working_dir: /
     command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
@@ -30,7 +30,6 @@ services:
     ports:
       - "8000:80"
       - "4443:443"
-      - "3456:3456"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt
