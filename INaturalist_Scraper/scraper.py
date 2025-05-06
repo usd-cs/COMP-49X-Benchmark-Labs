@@ -9,7 +9,7 @@ def get_true_observations():
     params = {
         'taxon_id': 408176, # ID for "Apple Powdery Mildew"
         'order_by': 'votes',
-        'quality_grade': 'research',
+        'quality_grade': 'research', # only research verified observations
         'photos': 'true',
         'page': '',
         'per_page': 200 # total number of research verified observations
