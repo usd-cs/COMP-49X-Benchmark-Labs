@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: {
                     labels: timeLabels,
                     datasets: [{
-                        label: 'Risk Level: ',
+                        label: 'Risk Level Prediction',
                         data: levels,
                         backgroundColor: colors,
                         borderColor: 'rgb(0, 0, 0)',
