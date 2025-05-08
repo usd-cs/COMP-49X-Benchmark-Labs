@@ -100,9 +100,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         label: 'Risk Level Over Time',
                         data: levels,
                         backgroundColor: colors,
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderColor: 'rgb(0, 0, 0)',
                         borderWidth: 1,
-                        fill: false
+                        fill: false,
+                        pointRadius: 6,
+                        pointHoverRadius: 8 
                     }]
                 },
                 options: {
