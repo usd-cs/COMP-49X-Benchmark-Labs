@@ -97,18 +97,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: {
                     labels: timeLabels,
                     datasets: [{
-                        label: 'Risk Level Over Time',
+                        label: 'Risk Level: ',
                         data: levels,
                         backgroundColor: colors,
                         borderColor: 'rgb(0, 0, 0)',
                         borderWidth: 1,
                         fill: false,
                         pointRadius: 6,
-                        pointHoverRadius: 8 
+                        pointHoverRadius: 8,
+                        pointStyle: 'circle',
+                        hoverBackgroundColor: colors,
+                        hoverBorderColor: 'rgb(0, 0, 0)',
+                        hoverBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const index = context.dataIndex;
+                                    const category = data[index].category;
+                                    const value = context.raw;
+                                    return `Risk Level: ${value}, Category: ${category}`;
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: {
                             title: {
@@ -126,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-            });              
+            });
         });
     });
 
