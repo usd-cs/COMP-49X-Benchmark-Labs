@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 import joblib
 import csv
 import pymongo
+import ydf
+
 
 app = Flask(__name__)
 
@@ -15,6 +17,9 @@ app = Flask(__name__)
 model_path = os.environ.get('MODEL_PATH', 'Notebook/model.knn')
 model = joblib.load(model_path)
 
+model_path_tf = os.environ.get('MODEL_PATH_TF', 'Notebook/powdery_mildew_model_decision_tree')
+model_tf = model = ydf.from_tensorflow_decision_forests(model_path_tf)
+                            
 # I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
 MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload")
 
@@ -203,6 +208,7 @@ def process_data(weather_df, timestamp):
     return features_df
 
 def find_category(prediction, confidence):
+    # as of now these are arbitrary thresholds, need testing to determine best values
     if prediction:
         if confidence > 0.90:
             return "Extremely High"
@@ -280,6 +286,7 @@ def predict():
         prediction = model.predict(features_array)[0]
         # returns list of probabilities for each class [x,y] where x is probability of False and y is probability of True
         confidences = model.predict_proba(features_array)[0]
+        confidences_tf = model_tf.predict(features_array)
         if prediction:
             confidence = confidences[1]
         else:
