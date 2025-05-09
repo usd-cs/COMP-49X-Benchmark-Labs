@@ -1,17 +1,36 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var map = L.map('map').setView([39.8283, -98.5795], 4);  // Centered on the US
+    var map = L.map('map').setView([39.8283, -98.5795], 4);  // Default to center of the US
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     var marker;
+    var resultsDiv = document.getElementById('results'); // Get the results div
+    var loadingDiv = document.getElementById('loading'); // Get the loading div
 
-    map.on('click', function (e) {
+    // Function to set marker at given location
+    function setMarker(lat, lng) {
         if (marker) {
             map.removeLayer(marker);
         }
-        marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+        map.setView([lat, lng], 13); // Zoom to the user's location
+    }
+
+    // Try to get the user's current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            setMarker(position.coords.latitude, position.coords.longitude);
+        }, function () {
+            console.error('Geolocation failed or permission denied.');
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+    }
+
+    map.on('click', function (e) {
+        setMarker(e.latlng.lat, e.latlng.lng);
     });
 
     document.getElementById('requestPMI').addEventListener('click', function () {
@@ -19,6 +38,11 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Please select a location on the map.');
             return;
         }
+
+        // Hide previous results
+        resultsDiv.classList.add('hidden');
+        // Show loading icon
+        loadingDiv.classList.remove('hidden');
 
         var latlng = marker.getLatLng();
         var timestamp = new Date().toISOString().split('T')[0];
@@ -36,19 +60,20 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
+            // Hide loading icon
+            loadingDiv.classList.add('hidden');
             // create chart
-            var resultsDiv = document.getElementById('results');
             resultsDiv.classList.remove('hidden');
             resultsDiv.innerHTML = '<h2>Prediction Results</h2>';
             // Create visualization
             var chartContainer = document.createElement('div');
             chartContainer.className = 'chart-container';
-            
+
             var canvas = document.createElement('canvas');
             canvas.id = 'predictionChart';
             chartContainer.appendChild(canvas);
             resultsDiv.appendChild(chartContainer);
-            
+
             // Create chart
             var ctx = canvas.getContext('2d');
             var timeLabels = data.map(item => item.timestamp);
@@ -83,14 +108,12 @@ document.addEventListener('DOMContentLoaded', function () {
             canvas.width = chartContainer.clientWidth;
             canvas.height = chartContainer.clientHeight;
 
-            
             // format labels to Day (Ex: Monday) and Time (Ex: 12:00 AM)
             timeLabels = timeLabels.map(label => {
                 var date = new Date(label);
                 var options = { weekday: 'long', hour: 'numeric', minute: 'numeric' };
                 return date.toLocaleDateString('en-US', options);
             });
-
 
             new Chart(ctx, {
                 type: 'line',
@@ -124,7 +147,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-            });              
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching prediction:', error);
+            alert('Error fetching prediction. Please try again.');
+            // Hide loading icon in case of error
+            loadingDiv.classList.add('hidden');
         });
     });
 
@@ -162,6 +191,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var latlng = marker.getLatLng();
         var timestamp = observationDateInput.value;
 
+        // Hide modal and finish card
+        modal.style.display = 'none';
+        finishCard.classList.add('hidden');
+
         fetch('/upload', {
             method: 'POST',
             headers: {
@@ -174,11 +207,12 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            alert('Report submitted successfully.');
-            modal.style.display = 'none';
+            // Show finish card
             finishCard.classList.remove('hidden');
+            alert('Report submitted successfully.');
         })
         .catch(error => {
+            console.error('Error submitting report:', error);
             alert('Error submitting report: ' + error.message);
         });
     });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <h1 class="title">Powdery Mildew Forecaster</h1>
     <div id="map"></div>
     <div class="button-container">
         <button id="requestPMI" class="action-button">Request PMI</button>
         <button id="reportMildew" class="action-button">Report Powdery Mildew</button>
+    </div>
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
     </div>
     <div id="results" class="hidden"></div>
 
@@ -34,7 +39,7 @@
         <h2>Thank you for your report!</h2>
         <p>Your observation has been successfully recorded.</p>
     </div>
-
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
+
 </html>
