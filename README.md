@@ -27,6 +27,7 @@ Install these via pip using `requirements.txt`, or manually:
 - `flask`
 - `pymongo`
 - `requests`
+- `python-dotenv`
 
 ### 🌐 External APIs (No API key required)
 - **NASA POWER DAV**  
@@ -50,11 +51,13 @@ cd COMP-49X-Benchmark-Labs
 pip install -r requirements.txt
 ```
 
-### 3. Set any environment variables *(optional for local use)*
-```bash
-export FLASK_ENV=development
-export MONGO_URI="mongodb://localhost:27017"
+### 3. Set up environment variables
+Create a `.env` file in the `/api` directory with the following variables:
 ```
+MONGODB_URI=mongodb+srv://username:password@cluster.example.mongodb.net/database
+```
+
+A template file `.env.example` is provided for reference.
 
 ### 4. Run the API
 ```bash
