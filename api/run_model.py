@@ -14,7 +14,7 @@ app = Flask(__name__)
 # Load trained model
 model_path = os.environ.get('MODEL_PATH', 'Notebook/model.knn')
 model = joblib.load(model_path)
-                            
+                    
 # I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
 MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload")
 
