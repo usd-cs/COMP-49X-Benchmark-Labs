@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 import joblib
 import csv
 import pymongo
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -15,8 +19,8 @@ app = Flask(__name__)
 model_path = os.environ.get('MODEL_PATH', 'Notebook/model.knn')
 model = joblib.load(model_path)
                     
-# I know this shouldn't be hardcoded, but DB is just for test purposes at the moment
-MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb+srv://benchmark:PMIUpload@pmi-upload.uvwlyon.mongodb.net/?retryWrites=true&w=majority&appName=PMI-Upload")
+# Load MongoDB from .env
+MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb://localhost:27017/pmi_data")
 
 # Fetch historical weather data from the NASA API, returns hourly data
 def get_nasa_data(lat, lon, start_date, end_date):
