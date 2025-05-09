@@ -28,6 +28,9 @@ def test_request():
         time.sleep(20)
         results_table = driver.find_element(By.ID, "results")
         assert results_table.is_displayed()
+    
+        results_chart = driver.find_element(By.ID, "predictionChart")
+        assert results_chart.is_displayed()
         
     finally:
         # Close the WebDriver
