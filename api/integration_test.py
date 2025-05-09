@@ -24,7 +24,7 @@ def test_upload_bulk():
     assert response.json().get('message') == "Data received and uploaded to MongoDB"
 
 def test_predict():
-    url = 'http://127.0.1:5000/predict'
+    url = 'http://127.0.0.1:5000/predict'
     data = {'latitude': 33.46810795527896, 'longitude': -102.65625000000001, 
             'timestamp': '2025-05-09'
     }
@@ -37,7 +37,7 @@ def test_predict():
     assert 'timestamp' in response.json()[0]
 
 def test_predict_values():
-    url = 'http://127.0.1:5000/predict'
+    url = 'http://127.0.0.1:5000/predict'
     data = {'latitude': 33.46810795527896, 'longitude': -102.65625000000001, 
             'timestamp': '2025-05-09'
     }
