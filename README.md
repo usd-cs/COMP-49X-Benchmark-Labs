@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Set up environment variables
-Create a `.env` file in the `/api` directory with the following variables:
+Create a `.env` file in the root directory with the following variables:
 ```
 MONGODB_URI=mongodb+srv://username:password@cluster.example.mongodb.net/database
 ```
